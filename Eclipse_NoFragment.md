@@ -12,3 +12,14 @@ __Steps:__
 
 5. Select EmptyActivity next time you create a project.
 
+
+###Problems with Appcompat in __res__###
+
+__Steps:__
+
+1. File->Import->Existing Android Code into Workspace(android-sdk\extras\android\support\v7). Choose "appcompat"
+
+2. Project-> properties->Android. In the section library "Add" and choose "appCompat"
+
+3. Clean the project.
+
