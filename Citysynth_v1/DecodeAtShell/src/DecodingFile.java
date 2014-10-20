@@ -21,7 +21,7 @@ public class DecodingFile {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		try {	
-			File file = new File("/home/mohit/Pictures/samsungdemo");
+			File file = new File("/home/cusp/mohitsharma44/citysynth/images/Realtime");
 			if(file.isDirectory()){  
 				myFiles = file.list();
 				System.out.println(myFiles.length);
@@ -37,9 +37,9 @@ public class DecodingFile {
 	}
 	static void decrypt(File myFile, int i) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
 	    FileInputStream fis = new FileInputStream(myFile);
-		File decfile = new File("/home/mohit/Pictures/dec/"+myFiles[i]);
+		File decfile = new File("/scratch/www/files/mohit/citysynth-website/images/1/"+myFiles[i]);
 	    FileOutputStream fos = new FileOutputStream(decfile);
-	    SecretKeySpec sks = new SecretKeySpec("centerforurbanscienceandprogress".getBytes(), "AES");
+	    SecretKeySpec sks = new SecretKeySpec("CenterforUrbanScienceandProgress".getBytes(), "AES");
 	    System.out.println("Secret Key Spec: "+sks);
 	    Cipher cipher = Cipher.getInstance("AES");
 	    cipher.init(Cipher.DECRYPT_MODE, sks);
