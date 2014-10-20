@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
 			offBtn.setEnabled(false);
 			listBtn.setEnabled(false);
 			findBtn.setEnabled(false);
-			text.setText("Status: Error..");
+			text.setText("Status: Error..No Bluetooth Radio found");
 			Toast.makeText(getApplicationContext(), "Bluetooth Device Not found..", Toast.LENGTH_SHORT).show();
 		}else{
 			text = (TextView) findViewById(R.id.text);
@@ -108,6 +108,11 @@ public class MainActivity extends Activity {
 				BTArrayAdapter.add(device.getName() + "\n" + device.getAddress());
 				BTArrayAdapter.notifyDataSetChanged();
 			}
+			if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){
+				myBluetoothAdapter.startDiscovery();
+				System.out.println("Scanning Again...");
+				Toast.makeText(getApplicationContext(), "Scanning Again...", Toast.LENGTH_SHORT).show();
+			}
 		}
 		
 	};
@@ -118,6 +123,7 @@ public class MainActivity extends Activity {
 			myBluetoothAdapter.cancelDiscovery();
 		}else{
 			BTArrayAdapter.clear();
+			registerReceiver(bReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
 			myBluetoothAdapter.startDiscovery();
 			registerReceiver(bReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 		}
