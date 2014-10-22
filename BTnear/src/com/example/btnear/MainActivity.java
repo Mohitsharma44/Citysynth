@@ -1,5 +1,7 @@
 package com.example.btnear;
 
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.Set;
 
 import android.app.Activity;
@@ -10,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -31,6 +34,7 @@ public class MainActivity extends Activity {
 	private ListView myListView;
 	private ArrayAdapter<String> BTArrayAdapter;
 	private int REQUEST_ENABLE_BT = 1;
+	PrintWriter out = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -107,8 +111,27 @@ public class MainActivity extends Activity {
 				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 				BTArrayAdapter.add(device.getName() + "\n" + device.getAddress());
 				BTArrayAdapter.notifyDataSetChanged();
+				System.out.println(BTArrayAdapter.getCount());
+				//for (int i=1;i<=BTArrayAdapter.getCount();i++){
+				//System.out.println("Contents of Array: "+BTArrayAdapter.getItem(0));
+				//}
 			}
 			if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){
+				File locationFileDir = Environment.getExternalStoragePublicDirectory("/cusp/health");
+				locationFileDir.mkdirs();
+				 String locfilename = locationFileDir.getPath() + File.separator + "Bid.txt";
+				 File location = new File (locfilename);
+				 if (!locationFileDir.exists() && locationFileDir.mkdirs()) {
+						System.out.println("Cannot create File/ Folder");
+					}
+						try{
+							System.out.println("Writing Device Information to file");
+							out = new PrintWriter(location);
+							for(int i = 0; i<BTArrayAdapter.getCount(); i++)
+							out.println(BTArrayAdapter.getItem(i));
+							out.flush();
+						    out.close();
+							}catch(Exception e){System.out.println("Error Flushing to a File " +e);}
 				myBluetoothAdapter.startDiscovery();
 				System.out.println("Scanning Again...");
 				Toast.makeText(getApplicationContext(), "Scanning Again...", Toast.LENGTH_SHORT).show();
