@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,6 +18,7 @@ public class MainActivity extends Activity {
 	private BluetoothAdapter myBluetoothAdapter;
 	private Button onBtn;
 	private Button offBtn;
+	private ArrayAdapter<String> BTArrayAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +65,12 @@ public class MainActivity extends Activity {
 			
 			Toast.makeText(getApplicationContext(), "Bluetooth On...", Toast.LENGTH_LONG).show();*/
 			System.out.println("Activity: Initializing Service...");
-			startService(new Intent(this, Trial.class));
+			
+			//myBluetoothAdapter.enable();
+			//myBluetoothAdapter.startDiscovery();
+			Intent startIntent = new Intent(MainActivity.this, Trial.class);
+			//startService(new Intent(this, Trial.class));
+			startService(startIntent);
 			Toast.makeText(getApplicationContext(), "Activity: Initializing Service...", Toast.LENGTH_SHORT).show();
 		//}
 		/*else{

@@ -3,41 +3,54 @@ package com.example.btnear_service;
 import java.io.File;
 import java.io.PrintWriter;
 
+import android.annotation.SuppressLint;
 import android.app.IntentService;
+import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothAdapter.LeScanCallback;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Environment;
+import android.os.IBinder;
+import android.os.SystemClock;
 import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
-public class Trial extends IntentService{
-	ArrayAdapter<String> BTArrayAdapter = null;
-	BluetoothAdapter myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+public class Trial extends Service{
+	private ArrayAdapter<String> BTArrayAdapter;
+	private BluetoothAdapter myBluetoothAdapter;
 	PrintWriter out = null;
-	public Trial() {
-		super("Trial");
-		// TODO Auto-generated constructor stub
-	}
+	private boolean discover = false;
+	String name;
+	String address;
 	
-	final BroadcastReceiver bReceiver = new BroadcastReceiver(){
+	
+	public BroadcastReceiver bReceiver = new BroadcastReceiver(){
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
+			System.out.println("Called onReceive");
 			String action = intent.getAction();
 			//When a new device is found
-			if(BluetoothDevice.ACTION_FOUND.equals(action)) {
+			try{
+			if(action.equals(BluetoothDevice.ACTION_FOUND)) {
+				System.out.println("Called ACTION_FOUND");
 				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-				BTArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-				BTArrayAdapter.notifyDataSetChanged();
-				System.out.println(BTArrayAdapter.getCount());
+				System.out.println("Device Name: "+device.getName());
+				System.out.println("Device Addr: "+device.getAddress());
+				name = device.getName();
+				address = device.getAddress();
+				//BTArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+				//BTArrayAdapter.notifyDataSetChanged();
+				//System.out.println(BTArrayAdapter.getCount());
 				//for (int i=1;i<=BTArrayAdapter.getCount();i++){
 				//System.out.println("Contents of Array: "+BTArrayAdapter.getItem(0));
 				//}
+			}
+			}catch(Exception e){System.out.println("Exception in ACTION_FOUND: "+e);
 			}
 			if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){
 				System.out.println("Scanning Done...");
@@ -51,10 +64,11 @@ public class Trial extends IntentService{
 						try{
 							System.out.println("Writing Device Information to file");
 							out = new PrintWriter(location);
-							for(int i = 0; i<BTArrayAdapter.getCount(); i++)
-							out.println(BTArrayAdapter.getItem(i));
+							out.println("Name: "+name);
+							out.println("Address: "+address);
 							out.flush();
 						    out.close();
+						    System.out.println("Wrote to the file..!");
 							}catch(Exception e){System.out.println("Error Flushing to a File " +e);}
 				//myBluetoothAdapter.startDiscovery();
 				//System.out.println("Scanning Again...");
@@ -65,25 +79,39 @@ public class Trial extends IntentService{
 	};
 
 
-	@Override
-	protected void onHandleIntent(Intent intent) {
+	public void onCreate() {
 		// TODO Auto-generated method stub
 		System.out.println("This service is called!");
-		String action = intent.getAction();
+		myBluetoothAdapter= BluetoothAdapter.getDefaultAdapter();
 		myBluetoothAdapter.enable();
-		myBluetoothAdapter.startDiscovery();
-		if(myBluetoothAdapter.isDiscovering()){
-			System.out.println("Discovering...");
-		registerReceiver(bReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+		SystemClock.sleep(5000);
+		if (myBluetoothAdapter.isEnabled()){
+			System.out.println("BT is enabled...");
+			discover = myBluetoothAdapter.startDiscovery();
 		}
-		else{
-			System.out.println("Finished Discovering...");
-			registerReceiver(bReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
-		}
+		System.out.println(myBluetoothAdapter.getScanMode());
+		
+		System.out.println("Discovering: "+myBluetoothAdapter.isDiscovering());
+		//registerReceiver(bReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+		IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+		IntentFilter filter2 = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+		this.registerReceiver(bReceiver, filter1);
+		this.registerReceiver(bReceiver, filter2);
+		//registerReceiver(bReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
 	}
 	public void onDestroy(){
 		super.onDestroy();
-		unregisterReceiver(bReceiver);
+		try{
+			if(bReceiver != null){
+				unregisterReceiver(bReceiver);
+			}
+		
+		}catch(Exception e){System.out.println("Exception Caught..: "+e);}
+	}
+	@Override
+	public IBinder onBind(Intent intent) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

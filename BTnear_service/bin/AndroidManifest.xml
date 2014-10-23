@@ -18,8 +18,7 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:label="@string/app_name">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -32,6 +31,7 @@
         
         <service android:enabled="true" android:name=".Scan" />
         <service android:enabled="true" android:name=".Trial" />
+
 
     </application>
 

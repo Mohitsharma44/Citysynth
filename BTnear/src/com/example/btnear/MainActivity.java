@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -182,9 +183,21 @@ public class MainActivity extends Activity {
 		}
 	}
 	
+	
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if (keyCode == KeyEvent.KEYCODE_BACK) {
+	        moveTaskToBack(true);
+	        return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}
+
 	protected void onDestroy(){
 		super.onDestroy();
 		unregisterReceiver(bReceiver);
+		startActivity(new Intent(this, MainActivity.class));
 	}
 
 
